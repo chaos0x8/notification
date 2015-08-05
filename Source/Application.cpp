@@ -36,7 +36,8 @@ int Application::run(int argc, char** argv)
         throw std::runtime_error("not enough parameters");
     }
 
-    Notification note{args[0]};
+    Notification note;
+    note.name = args[0];
     note.content = args[1];
     note.icon = Notification::ICON_INFO;
     note.timeout = duration_cast<milliseconds>(seconds(5));

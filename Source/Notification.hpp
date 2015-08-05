@@ -27,13 +27,11 @@
 class Notification
 {
 public:
-    explicit Notification(const std::string& name);
-
     void show();
 
     static const std::string ICON_INFO;
 
-    const std::string name;
+    std::string name;
     std::string content;
     std::string icon;
     std::chrono::milliseconds timeout{1000};

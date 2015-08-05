@@ -22,17 +22,12 @@
 #include <stdexcept>
 #include <cassert>
 
-Notification::Notification(const std::string& name)
-    : name(name)
-{
-    assert(name.size());
-
-    notify_init(name.c_str());
-}
-
 void Notification::show()
 {
     assert(note == nullptr);
+    assert(name.size());
+
+    notify_init(name.c_str());
 
     note = notify_notification_new(name.c_str(), content.c_str(), icon.c_str());
     notify_notification_set_timeout(note, timeout.count());
