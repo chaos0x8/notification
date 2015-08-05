@@ -1,0 +1,3 @@
+[submodule "cppCommon"]
+	path = cppCommon
+	url = https://github.com/chaos0x8/cppCommon
