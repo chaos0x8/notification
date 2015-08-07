@@ -42,7 +42,12 @@ Application.new do |t|
     t.dependencies = [ 'cppCommon/lib/libcommon.a' ]
 end
 
-file 'cppCommon/lib/libcommon.a' => :rebuild do
+file 'cppCommon/.git' do
+    sh 'git submodule init'
+    sh 'git submodule update'
+end
+
+file 'cppCommon/lib/libcommon.a' => [ 'cppCommon/.git', :rebuild ] do
     sh 'cd cppCommon && rake lib/libcommon.a'
 end
 
