@@ -23,32 +23,19 @@ def web_require url
     require_relative File.basename(url)
 end
 
-web_require "https://raw.github.com/chaos0x8/rake-builder/master/RakeBuilder.rb"
+web_require "https://raw.github.com/chaos0x8/rake-builder/master/lib/RakeBuilder.rb"
 
-if ARGV.index("nodebug").nil?
-    FLAGS = [ "--std=c++1y", "-g" ]
-else
-    FLAGS = [ "--std=c++1y", "-O3", "-s", "-DNDEBUG" ]
+#FLAGS = [ "--std=c++1y", "-g" ]
+FLAGS = [ "--std=c++1y", "-O3", "-s", "-DNDEBUG" ]
 
-    task :nodebug
-end
+CPP_COMMON = GitSubmodule['cppCommon' => ['lib/libcommon.a']]
 
-Application.new do |t|
-    t.name = 'bin/notification'
+Executable.new do |t|
     t.flags = FLAGS
-    t.files = FileList['Source/*.cpp']
-    t.libs = [ Pkg.new('libnotify'), Pkg.new('gtk+-2.0'), '-LcppCommon/lib', '-lcommon' ]
     t.includes = [ 'Source', 'cppCommon/Source' ]
-    t.dependencies = [ 'cppCommon/lib/libcommon.a' ]
-end
-
-file 'cppCommon/.git' do
-    sh 'git submodule init'
-    sh 'git submodule update'
-end
-
-file 'cppCommon/lib/libcommon.a' => [ 'cppCommon/.git', :rebuild ] do
-    sh 'cd cppCommon && rake lib/libcommon.a'
+    t.libs = [ Pkg.new('libnotify'), Pkg.new('gtk+-2.0'), CPP_COMMON ]
+    t.name = 'bin/notification'
+    t.sources = FileList['Source/*.cpp']
 end
 
 task :default => [ 'bin/notification' ]
