@@ -30,12 +30,12 @@ FLAGS = [ "--std=c++1y", "-O3", "-s", "-DNDEBUG" ]
 
 CPP_COMMON = GitSubmodule['cppCommon' => ['lib/libcommon.a']]
 
-Executable.new do |t|
-    t.flags = FLAGS
-    t.includes = [ 'Source', 'cppCommon/Source' ]
-    t.libs = [ Pkg.new('libnotify'), Pkg.new('gtk+-2.0'), CPP_COMMON ]
-    t.name = 'bin/notification'
-    t.sources = FileList['Source/*.cpp']
+exe = Executable.new do |t|
+  t.flags = FLAGS
+  t.includes = [ 'Source', 'cppCommon/Source' ]
+  t.libs = [ Pkg.new('libnotify'), Pkg.new('gtk+-2.0'), CPP_COMMON ]
+  t.name = 'bin/notification'
+  t.sources = FileList['Source/*.cpp']
 end
 
-task :default => [ 'bin/notification' ]
+task(default: RakeBuilder::Names[exe])
