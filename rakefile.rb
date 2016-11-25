@@ -23,19 +23,20 @@ def web_require url
     require_relative File.basename(url)
 end
 
-web_require "https://raw.github.com/chaos0x8/rake-builder/master/lib/RakeBuilder.rb"
+web_require "https://raw.github.com/chaos0x8/rake-builder/v3/lib/RakeBuilder.rb"
 
 #FLAGS = [ "--std=c++1y", "-g" ]
 FLAGS = [ "--std=c++1y", "-O3", "-s", "-DNDEBUG" ]
 
-CPP_COMMON = GitSubmodule['cppCommon' => ['lib/libcommon.a']]
+CPP_COMMON = GitSubmodule.new(name: 'cppCommon', libs: ['lib/libcommon.a'])
 
-exe = Executable.new do |t|
-  t.flags = FLAGS
-  t.includes = [ 'Source', 'cppCommon/Source' ]
-  t.libs = [ Pkg.new('libnotify'), Pkg.new('gtk+-2.0'), CPP_COMMON ]
+exe = Executable.new { |t|
   t.name = 'bin/notification'
-  t.sources = FileList['Source/*.cpp']
-end
+  t.flags << FLAGS
+  t.includes << [ 'Source', 'cppCommon/Source' ]
+  t.libs << [ CPP_COMMON ]
+  t.pkgs << [ 'libnotify', 'gtk+-3.0' ]
+  t.sources << FileList['Source/*.cpp']
+}
 
 task(default: RakeBuilder::Names[exe])
