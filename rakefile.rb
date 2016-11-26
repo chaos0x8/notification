@@ -18,12 +18,9 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-def web_require url
-    system "wget #{url}" unless File.exist?(File.basename(url))
-    require_relative File.basename(url)
-end
+gem 'rake-builder', '~> 0.3.0'
 
-web_require "https://raw.github.com/chaos0x8/rake-builder/v3/lib/RakeBuilder.rb"
+require 'RakeBuilder'
 
 #FLAGS = [ "--std=c++1y", "-g" ]
 FLAGS = [ "--std=c++1y", "-O3", "-s", "-DNDEBUG" ]
