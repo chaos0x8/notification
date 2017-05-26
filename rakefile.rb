@@ -22,8 +22,7 @@ gem 'rake-builder', '~> 0.3.0'
 
 require 'RakeBuilder'
 
-#FLAGS = [ "--std=c++1y", "-g" ]
-FLAGS = [ "--std=c++1y", "-O3", "-s", "-DNDEBUG" ]
+FLAGS = [ "--std=c++14", '-Wall', '-Werror', "-O3", "-s", "-DNDEBUG", '-Wno-deprecated' ]
 
 CPP_COMMON = GitSubmodule.new(name: 'cppCommon', libs: ['lib/libcommon.a'])
 
