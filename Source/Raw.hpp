@@ -20,25 +20,37 @@
 
 #pragma once
 
-#include <libnotify/notify.h>
-#include <string>
-#include <chrono>
+#include <vector>
+#include <type_traits>
+#include <cstring>
 
-namespace Notify
+struct Raw
 {
-  class Notification
+  template <class T, typename std::enable_if<std::is_pod<T>::value, int>::type = 0>
+  void insert(const T* payload)
   {
-  public:
-    void show();
+    const auto prevSize = _raw.size();
+    _raw.resize(prevSize + sizeof(*payload));
+    std::memcpy(_raw.data()+prevSize, payload, sizeof(*payload));
+  }
 
-    static const std::string ICON_INFO;
+  void insert(const void* payload, size_t payloadSize)
+  {
+    const auto prevSize = _raw.size();
+    _raw.resize(prevSize + payloadSize);
+    std::memcpy(_raw.data()+prevSize, payload, payloadSize);
+  }
 
-    std::string name;
-    std::string content;
-    std::string icon;
-    std::chrono::milliseconds timeout{1000};
+  const unsigned char* data() const
+  {
+    return _raw.data();
+  }
 
-  private:
-    NotifyNotification* note{nullptr};
-  };
-}
+  size_t size() const
+  {
+    return _raw.size();
+  }
+
+private:
+  std::vector<unsigned char> _raw;
+};

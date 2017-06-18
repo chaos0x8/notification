@@ -18,27 +18,48 @@
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#pragma once
+#include "Application.hpp"
+#include <OptionParser.hpp>
+#include <Common/Exceptions.hpp>
+#include <iostream>
+#include <gtk/gtk.h>
 
-#include <libnotify/notify.h>
-#include <string>
-#include <chrono>
-
-namespace Notify
+enum class Tag : uint32_t
 {
-  class Notification
+};
+
+int main(int argc, char** argv)
+{
+  using namespace Common::OptionParser;
+
+  auto parser = makeParser<Tag>();
+  parser.addHelpPrefix("Usage: notification [options] title content");
+  parser.parse(&argc, argv);
+
+  auto ARGV = Argv(&argc, argv);
+
+  try
   {
-  public:
-    void show();
-
-    static const std::string ICON_INFO;
-
-    std::string name;
-    std::string content;
-    std::string icon;
-    std::chrono::milliseconds timeout{1000};
-
-  private:
-    NotifyNotification* note{nullptr};
-  };
+    try
+    {
+      return Application::notifyViaServer(ARGV);
+    }
+    catch (const Common::Exceptions::SystemError&)
+    {
+      gtk_init(&argc, &argv);
+      return Application::notify(ARGV);
+    }
+  }
+  catch (const OPError& e)
+  {
+    std::cerr << e.what() << std::endl
+              << std::endl
+              << parser.help();
+    return -1;
+  }
+  catch (std::exception& e)
+  {
+    std::cerr << "Exception: '" << e.what() << "'" << std::endl;
+    return -1;
+  }
 }

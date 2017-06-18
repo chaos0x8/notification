@@ -48,3 +48,5 @@ tags
 # Diff files
 *.diff
 
+# Generated
+Source/Config.cpp

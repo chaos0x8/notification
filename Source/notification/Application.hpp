@@ -20,25 +20,11 @@
 
 #pragma once
 
-#include <libnotify/notify.h>
-#include <string>
-#include <chrono>
+#include <OptionParser/Argv.hpp>
 
-namespace Notify
+class Application
 {
-  class Notification
-  {
-  public:
-    void show();
-
-    static const std::string ICON_INFO;
-
-    std::string name;
-    std::string content;
-    std::string icon;
-    std::chrono::milliseconds timeout{1000};
-
-  private:
-    NotifyNotification* note{nullptr};
-  };
-}
+public:
+  static int notifyViaServer(Common::OptionParser::Argv&);
+  static int notify(Common::OptionParser::Argv&);
+};

@@ -20,25 +20,31 @@
 
 #pragma once
 
-#include <libnotify/notify.h>
-#include <string>
-#include <chrono>
+#include <Network.hpp>
 
-namespace Notify
+namespace Common::OptionParser
 {
-  class Notification
-  {
-  public:
-    void show();
-
-    static const std::string ICON_INFO;
-
-    std::string name;
-    std::string content;
-    std::string icon;
-    std::chrono::milliseconds timeout{1000};
-
-  private:
-    NotifyNotification* note{nullptr};
-  };
+  struct Argv;
 }
+
+struct Application
+{
+  static int run(Common::OptionParser::Argv&);
+  static void stop();
+
+  Application(Common::OptionParser::Argv&);
+  ~Application();
+
+  int run();
+
+private:
+  void serverProc();
+  void clientProc(Common::Network::NativeHandler nativeHandler);
+
+  Common::OptionParser::Argv& ARGV;
+
+  std::vector<Common::Network::TcpIpClient> clients;
+  Common::Network::TcpIpServer server;
+
+  Common::Network::Selector selector;
+};

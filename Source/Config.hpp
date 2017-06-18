@@ -20,25 +20,9 @@
 
 #pragma once
 
-#include <libnotify/notify.h>
 #include <string>
-#include <chrono>
 
-namespace Notify
+namespace Config
 {
-  class Notification
-  {
-  public:
-    void show();
-
-    static const std::string ICON_INFO;
-
-    std::string name;
-    std::string content;
-    std::string icon;
-    std::chrono::milliseconds timeout{1000};
-
-  private:
-    NotifyNotification* note{nullptr};
-  };
+  extern const std::string PORT;
 }
