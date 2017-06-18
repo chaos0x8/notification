@@ -23,7 +23,7 @@
 #include "Messages.hpp"
 #include "Notification.hpp"
 #include <Common/Algorithm.hpp>
-#include <OptionParser/Argv.hpp>
+#include <OptionParser/Args.hpp>
 #include <csignal>
 #include <memory>
 #include <chrono>
@@ -52,11 +52,11 @@ extern "C" void signalHandler(int)
   ::stopOther();
 }
 
-int Application::run(Common::OptionParser::Argv& ARGV)
+int Application::run(Common::OptionParser::Args& args)
 {
   try
   {
-    auto app = std::make_unique<Application>(ARGV);
+    auto app = std::make_unique<Application>(args);
     return app->run();
   }
   catch (const Common::Exceptions::SystemError& e)
@@ -73,8 +73,8 @@ void Application::stop()
   ::stopOther();
 }
 
-Application::Application(Common::OptionParser::Argv& ARGV)
-  : ARGV(ARGV),
+Application::Application(Common::OptionParser::Args& args)
+  : args(args),
     server("localhost", Config::PORT)
 {
   selector.add(server, &Application::serverProc, this);

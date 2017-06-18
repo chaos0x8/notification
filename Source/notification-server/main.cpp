@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     opts.addHelpPrefix("Usage: notification-server [options]");
     opts.parse(&argc, argv);
 
-    auto ARGV = Argv(&argc, argv);
+    auto args = Args(&argc, argv);
 
     if (opts.get<Tag::Help>().value())
     {
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
     }
     else
     {
-      return Application::run(ARGV);
+      return Application::run(args);
     }
   }
   catch (std::exception& e)

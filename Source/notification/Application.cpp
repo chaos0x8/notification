@@ -23,16 +23,16 @@
 #include "Messages.hpp"
 #include "Raw.hpp"
 #include "Config.hpp"
-#include <OptionParser/Argv.hpp>
+#include <OptionParser/Args.hpp>
 #include <Network.hpp>
 #include <stdexcept>
 
-int Application::notifyViaServer(Common::OptionParser::Argv& ARGV)
+int Application::notifyViaServer(Common::OptionParser::Args& args)
 {
   auto client = Common::Network::TcpIpClient("localhost", Config::PORT);
 
-  std::string title = ARGV.take();
-  std::string content = ARGV.take();
+  std::string title = args.take();
+  std::string content = args.take();
 
   auto message = Message();
   message.type = Message::Type::Notification;
@@ -50,13 +50,13 @@ int Application::notifyViaServer(Common::OptionParser::Argv& ARGV)
   return 0;
 }
 
-int Application::notify(Common::OptionParser::Argv& ARGV)
+int Application::notify(Common::OptionParser::Args& args)
 {
   using namespace std::chrono;
 
   Notify::Notification note;
-  note.name = ARGV.take();
-  note.content = ARGV.take();
+  note.name = args.take();
+  note.content = args.take();
   note.icon = Notify::Notification::ICON_INFO;
   note.timeout = duration_cast<milliseconds>(seconds(5));
   note.show();

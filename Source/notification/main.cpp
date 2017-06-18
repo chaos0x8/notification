@@ -36,18 +36,18 @@ int main(int argc, char** argv)
   parser.addHelpPrefix("Usage: notification [options] title content");
   parser.parse(&argc, argv);
 
-  auto ARGV = Argv(&argc, argv);
+  auto args = Args(&argc, argv);
 
   try
   {
     try
     {
-      return Application::notifyViaServer(ARGV);
+      return Application::notifyViaServer(args);
     }
     catch (const Common::Exceptions::SystemError&)
     {
       gtk_init(&argc, &argv);
-      return Application::notify(ARGV);
+      return Application::notify(args);
     }
   }
   catch (const OPError& e)

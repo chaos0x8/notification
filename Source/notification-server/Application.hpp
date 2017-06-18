@@ -24,15 +24,15 @@
 
 namespace Common::OptionParser
 {
-  struct Argv;
+  struct Args;
 }
 
 struct Application
 {
-  static int run(Common::OptionParser::Argv&);
+  static int run(Common::OptionParser::Args&);
   static void stop();
 
-  Application(Common::OptionParser::Argv&);
+  Application(Common::OptionParser::Args&);
   ~Application();
 
   int run();
@@ -41,7 +41,7 @@ private:
   void serverProc();
   void clientProc(Common::Network::NativeHandler nativeHandler);
 
-  Common::OptionParser::Argv& ARGV;
+  Common::OptionParser::Args& args;
 
   std::vector<Common::Network::TcpIpClient> clients;
   Common::Network::TcpIpServer server;

@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include <OptionParser/Argv.hpp>
+#include <OptionParser/Args.hpp>
 
 class Application
 {
 public:
-  static int notifyViaServer(Common::OptionParser::Argv&);
-  static int notify(Common::OptionParser::Argv&);
+  static int notifyViaServer(Common::OptionParser::Args&);
+  static int notify(Common::OptionParser::Args&);
 };
