@@ -69,7 +69,18 @@ namespace Notify
   void Notification::execAction(NotifyNotification*, char*, gpointer data)
   {
     auto action = static_cast<Action*>(data);
-    boost::process::spawn(action->cmd);
+
+    const auto pos = action->cmd.find_first_of(" ");
+    if (pos != std::string::npos)
+    {
+      auto cmd = action->cmd.substr(0, pos);
+      auto arg = action->cmd.substr(pos+1, action->cmd.size()-pos-1);
+      boost::process::spawn(cmd, arg);
+    }
+    else
+    {
+      boost::process::spawn(action->cmd);
+    }
   }
 
   void Notification::freeAction(gpointer data)
