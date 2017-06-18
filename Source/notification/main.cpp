@@ -19,6 +19,7 @@
  */
 
 #include "Application.hpp"
+#include "Notification.hpp"
 #include <OptionParser.hpp>
 #include <Common/Exceptions.hpp>
 #include <iostream>
@@ -26,13 +27,18 @@
 
 enum class Tag : uint32_t
 {
+  Action,
+  ActionLabel
 };
 
 int main(int argc, char** argv)
 {
   using namespace Common::OptionParser;
 
-  auto parser = makeParser<Tag>();
+  auto parser = makeParser<Tag>(
+    tagged<Tag, Tag::ActionLabel>(Option<std::string>("-l", "--action-label").description("Label for action to execute (works only when server is active)")),
+    tagged<Tag, Tag::Action>(Option<std::string>("-a", "--action").description("Command to execute (works only when server is active)"))
+  );
   parser.addHelpPrefix("Usage: notification [options] title content");
   parser.parse(&argc, argv);
 
@@ -42,11 +48,12 @@ int main(int argc, char** argv)
   {
     try
     {
-      return Application::notifyViaServer(args);
+      return Application::notifyViaServer(parser.namedArgs(), args);
     }
     catch (const Common::Exceptions::SystemError&)
     {
       gtk_init(&argc, &argv);
+      Notify::init("notification");
       return Application::notify(args);
     }
   }

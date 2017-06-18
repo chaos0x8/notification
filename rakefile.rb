@@ -52,7 +52,7 @@ exe = Dir['Source/*'].select { |x| File.directory?(x) }.collect { |dir|
     t.name = "bin/#{File.basename(dir)}"
     t.flags << FLAGS
     t.includes << INCLUDES
-    t.libs << CPP_COMMON
+    t.libs << CPP_COMMON << ['-lboost_system']
     t.pkgs << PKGS
     t.sources << SHARED_FILES << FileList["#{dir}/*.cpp"]
   }

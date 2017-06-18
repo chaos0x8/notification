@@ -18,32 +18,43 @@
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "Notification.hpp"
-#include <stdexcept>
-#include <cassert>
+#pragma once
+
+#include <libnotify/notify.h>
+#include <string>
+#include <chrono>
+#include <optional>
 
 namespace Notify
 {
-  void Notification::show()
+  void init(std::string appName);
+
+  class Notification
   {
-    assert(note == nullptr);
-    assert(name.size());
-
-    notify_init(name.c_str());
-
-    note = notify_notification_new(name.c_str(), content.c_str(), icon.c_str());
-    notify_notification_set_timeout(note, timeout.count());
-    notify_notification_set_category(note, "Testing Notifications");
-    notify_notification_set_urgency(note, NOTIFY_URGENCY_NORMAL);
-
-    GError* error = nullptr;
-    notify_notification_show(note, &error);
-
-    if (error != nullptr)
+  public:
+    struct Action
     {
-      throw std::runtime_error("error during 'notify_notification_show");
-    }
-  }
+      Action(std::string label, std::string cmd);
 
-  const std::string Notification::ICON_INFO = "info";
+      std::string label;
+      std::string cmd;
+    };
+
+    void show();
+
+    static const std::string ICON_INFO;
+
+    std::string name;
+    std::string content;
+    std::string icon;
+    std::chrono::milliseconds timeout{1000};
+
+    std::optional<Action> action;
+
+  private:
+    static void execAction(NotifyNotification*, char*, gpointer);
+    static void freeAction(gpointer);
+
+    NotifyNotification* note{nullptr};
+  };
 }

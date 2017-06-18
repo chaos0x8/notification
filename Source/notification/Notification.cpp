@@ -18,27 +18,34 @@
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#pragma once
-
-#include <libnotify/notify.h>
-#include <string>
-#include <chrono>
+#include "Notification.hpp"
+#include <stdexcept>
+#include <cassert>
 
 namespace Notify
 {
-  class Notification
+  const std::string Notification::ICON_INFO = "info";
+
+  void init(std::string appName)
   {
-  public:
-    void show();
+    notify_init(appName.c_str());
+  }
 
-    static const std::string ICON_INFO;
+  void Notification::show()
+  {
+    assert(note == nullptr);
 
-    std::string name;
-    std::string content;
-    std::string icon;
-    std::chrono::milliseconds timeout{1000};
+    note = notify_notification_new(name.c_str(), content.c_str(), icon.c_str());
+    notify_notification_set_timeout(note, timeout.count());
+    notify_notification_set_category(note, "Testing Notifications");
+    notify_notification_set_urgency(note, NOTIFY_URGENCY_NORMAL);
 
-  private:
-    NotifyNotification* note{nullptr};
-  };
+    GError* error = nullptr;
+    notify_notification_show(note, &error);
+
+    if (error != nullptr)
+    {
+      throw std::runtime_error("error during 'notify_notification_show");
+    }
+  }
 }

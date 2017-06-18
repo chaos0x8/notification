@@ -23,26 +23,31 @@
 #include "Messages.hpp"
 #include "Raw.hpp"
 #include "Config.hpp"
-#include <OptionParser/Args.hpp>
 #include <Network.hpp>
 #include <stdexcept>
 
-int Application::notifyViaServer(Common::OptionParser::Args& args)
+int Application::notifyViaServer(Common::OptionParser::NamedArgs namedArgs, Common::OptionParser::Args& args)
 {
   auto client = Common::Network::TcpIpClient("localhost", Config::PORT);
 
   std::string title = args.take();
   std::string content = args.take();
+  std::string action = namedArgs["--action"];
+  std::string actionLabel = namedArgs["--action-label"];
 
   auto message = Message();
   message.type = Message::Type::Notification;
   message.notification.titleSize = title.size();
   message.notification.contentSize = content.size();
+  message.notification.actionLabelSize = actionLabel.size();
+  message.notification.actionSize = action.size();
 
   auto raw = Raw();
   raw.insert(&message);
   raw.insert(title.data(), title.size());
   raw.insert(content.data(), content.size());
+  raw.insert(actionLabel.data(), actionLabel.size());
+  raw.insert(action.data(), action.size());
 
   client.send(raw.data(), raw.size());
   client.shutdown();

@@ -20,36 +20,27 @@
 
 #pragma once
 
-struct Command
+#include <libnotify/notify.h>
+#include <string>
+#include <chrono>
+
+namespace Notify
 {
-  enum class Type : char
+  void init(std::string appName);
+
+  class Notification
   {
-    Stop = 's'
+  public:
+    void show();
+
+    std::string name;
+    std::string content;
+    std::string icon;
+    std::chrono::milliseconds timeout{1000};
+
+    static const std::string ICON_INFO;
+
+  private:
+    NotifyNotification* note{nullptr};
   };
-
-  Type type;
-};
-
-struct Notification
-{
-  uint32_t titleSize;
-  uint32_t contentSize;
-  uint32_t actionLabelSize;
-  uint32_t actionSize;
-};
-
-struct Message
-{
-  enum class Type : uint32_t
-  {
-    Command,
-    Notification
-  };
-
-  Type type;
-
-  union {
-    Command command;
-    Notification notification;
-  };
-};
+}

@@ -20,6 +20,7 @@
 
 #include "Application.hpp"
 #include "OptionParser.hpp"
+#include "Notification.hpp"
 #include <iostream>
 #include <gtk/gtk.h>
 
@@ -36,6 +37,7 @@ int main(int argc, char** argv)
     using namespace Common::OptionParser;
 
     gtk_init(&argc, &argv);
+    Notify::init("notification-server");
 
     auto opts = makeParser<Tag>(
       tagged<Tag, Tag::Stop>(Option<bool>("-s", "--stop").description("stops running server")),

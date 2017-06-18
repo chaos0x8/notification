@@ -28,6 +28,7 @@
 #include <memory>
 #include <chrono>
 #include <iostream>
+#include <gtk/gtk.h>
 
 extern "C" void stopOther()
 {
@@ -87,7 +88,12 @@ int Application::run()
   std::signal(SIGINT, signalHandler);
   std::signal(SIGTERM, signalHandler);
 
-  selector.wait();
+  selector.on_finish([]{
+    gtk_main_quit();
+  });
+
+  gtk_main();
+
   return 0;
 }
 
@@ -130,11 +136,23 @@ void Application::clientProc(Common::Network::NativeHandler nativeHandler)
         auto content = std::string(message.notification.contentSize, '\0');
         client->receive(content.data(), content.size());
 
+        auto actionLabel = std::string(message.notification.actionLabelSize, '\0');
+        client->receive(actionLabel.data(), actionLabel.size());
+
+        auto action = std::string(message.notification.actionSize, '\0');
+        client->receive(action.data(), action.size());
+
         Notify::Notification note;
         note.name = title;
         note.content = content;
         note.icon = Notify::Notification::ICON_INFO;
         note.timeout = duration_cast<milliseconds>(seconds(5));
+
+        if (actionLabel.size() > 0 and action.size() > 0)
+        {
+          note.action = Notify::Notification::Action(actionLabel, action);
+        }
+
         note.show();
         break;
       }
