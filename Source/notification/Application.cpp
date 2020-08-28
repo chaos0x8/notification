@@ -1,39 +1,17 @@
-/*!
- *  \author <https://github.com/chaos0x8>
- *  \copyright
- *  Copyright (c) 2015, <https://github.com/chaos0x8>
- *
- *  \copyright
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  \copyright
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-
 #include "Application.hpp"
-#include "Notification.hpp"
-#include "Messages.hpp"
-#include "Raw.hpp"
 #include "Config.hpp"
-#include <Network.hpp>
+#include "Messages.hpp"
+#include "Notification.hpp"
+#include "Raw.hpp"
+#include "c8-network.hpp"
 #include <stdexcept>
 
-int Application::notifyViaServer(Common::OptionParser::NamedArgs namedArgs, Common::OptionParser::Args& args)
-{
-  auto client = Common::Network::TcpIpClient("localhost", Config::PORT);
+int Application::notifyViaServer(std::string_view action,
+  std::string_view actionLabel, C8::OptionParser::Args args) {
+  auto client = C8::Network::TcpIpClient("localhost", Config::PORT);
 
   std::string title = args.take();
   std::string content = args.take();
-  std::string action = namedArgs["--action"];
-  std::string actionLabel = namedArgs["--action-label"];
 
   auto message = Message();
   message.type = Message::Type::Notification;
@@ -55,8 +33,7 @@ int Application::notifyViaServer(Common::OptionParser::NamedArgs namedArgs, Comm
   return 0;
 }
 
-int Application::notify(Common::OptionParser::Args& args)
-{
+int Application::notify(C8::OptionParser::Args args) {
   using namespace std::chrono;
 
   Notify::Notification note;
@@ -68,4 +45,3 @@ int Application::notify(Common::OptionParser::Args& args)
 
   return 0;
 }
-

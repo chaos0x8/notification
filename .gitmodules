@@ -1,3 +1,6 @@
-[submodule "cppCommon"]
-	path = cppCommon
-	url = https://github.com/chaos0x8/cppCommon
+[submodule "cpp-common"]
+	path = cpp-common
+	url = https://github.com/chaos0x8/cpp-common
+[submodule "c8-cpp"]
+	path = c8-cpp
+	url = https://github.com/chaos0x8/c8-cpp.git

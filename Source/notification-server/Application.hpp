@@ -1,50 +1,25 @@
-/*!
- *  \author <https://github.com/chaos0x8>
- *  \copyright
- *  Copyright (c) 2015, <https://github.com/chaos0x8>
- *
- *  \copyright
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  \copyright
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-
 #pragma once
 
-#include <Network.hpp>
+#include "c8-network.hpp"
+#include "c8-option-parser.hpp"
 
-namespace Common::OptionParser
-{
-  struct Args;
-}
-
-struct Application
-{
-  static int run(Common::OptionParser::Args&);
+struct Application {
+  static int run(C8::OptionParser::Args);
   static void stop();
 
-  Application(Common::OptionParser::Args&);
+  Application(C8::OptionParser::Args);
   ~Application();
 
   int run();
 
 private:
   void serverProc();
-  void clientProc(Common::Network::NativeHandler nativeHandler);
+  void clientProc(C8::Network::NativeHandler nativeHandler);
 
-  Common::OptionParser::Args& args;
+  C8::OptionParser::Args args;
 
-  std::vector<Common::Network::TcpIpClient> clients;
-  Common::Network::TcpIpServer server;
+  std::vector<C8::Network::TcpIpClient> clients;
+  C8::Network::TcpIpServer server;
 
-  Common::Network::Selector selector;
+  C8::Network::Selector selector;
 };

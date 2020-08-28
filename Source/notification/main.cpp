@@ -1,71 +1,43 @@
-/*!
- *  \author <https://github.com/chaos0x8>
- *  \copyright
- *  Copyright (c) 2015, <https://github.com/chaos0x8>
- *
- *  \copyright
- *  Permission to use, copy, modify, and/or distribute this software for any
- *  purpose with or without fee is hereby granted, provided that the above
- *  copyright notice and this permission notice appear in all copies.
- *
- *  \copyright
- *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-
 #include "Application.hpp"
 #include "Notification.hpp"
-#include <OptionParser.hpp>
-#include <Common/Exceptions.hpp>
-#include <iostream>
+#include "c8-common/errors/SystemError.hpp"
+#include "c8-option-parser.hpp"
 #include <gtk/gtk.h>
+#include <iostream>
 
-enum class Tag : uint32_t
-{
-  Action,
-  ActionLabel
-};
+enum class Tag : uint32_t { Action, ActionLabel };
 
-int main(int argc, char** argv)
-{
-  using namespace Common::OptionParser;
+int main(int argc, char** argv) {
+  C8::OptionParser::Parser op;
+  auto action = op.on<std::string>(
+    "--action", "Command to execute (works only when server is active");
+  auto actionLabel = op.on<std::string>("--action-label",
+    "Label for action to execute (works only when server is active)");
+  auto help = op.on<bool>("--help", "Displays help");
 
-  auto parser = makeParser<Tag>(
-    tagged<Tag, Tag::ActionLabel>(Option<std::string>("-l", "--action-label").description("Label for action to execute (works only when server is active)")),
-    tagged<Tag, Tag::Action>(Option<std::string>("-a", "--action").description("Command to execute (works only when server is active)"))
-  );
-  parser.addHelpPrefix("Usage: notification [options] title content");
-  parser.parse(&argc, argv);
+  try {
+    using namespace std::string_literals;
 
-  auto args = Args(&argc, argv);
+    op.parse(argc, argv);
+    op.banner("Usage: "s + std::string(op.name()) +
+              "notification [options] title content"s);
 
-  try
-  {
-    try
-    {
-      return Application::notifyViaServer(parser.namedArgs(), args);
+    if (help == true) {
+      std::cout << op.help() << std::endl;
+      return -1;
     }
-    catch (const Common::Exceptions::SystemError&)
-    {
+
+    try {
+      return Application::notifyViaServer(*action, *actionLabel, op.args());
+    } catch (const C8::Common::Errors::SystemError&) {
       gtk_init(&argc, &argv);
       Notify::init("notification");
-      return Application::notify(args);
+      return Application::notify(op.args());
     }
-  }
-  catch (const OPError& e)
-  {
-    std::cerr << e.what() << std::endl
-              << std::endl
-              << parser.help();
+  } catch (const C8::OptionParser::Error& e) {
+    std::cerr << e.what() << std::endl << std::endl << op.help();
     return -1;
-  }
-  catch (std::exception& e)
-  {
+  } catch (std::exception& e) {
     std::cerr << "Exception: '" << e.what() << "'" << std::endl;
     return -1;
   }

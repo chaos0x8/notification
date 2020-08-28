@@ -1,47 +1,34 @@
 #!/usr/bin/ruby
 
-# \author <https://github.com/chaos0x8>
-# \copyright
-# Copyright (c) 2015, <https://github.com/chaos0x8>
-#
-# \copyright
-# Permission to use, copy, modify, and/or distribute this software for any
-# purpose with or without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies.
-#
-# \copyright
-# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+gem 'rake-builder', '~> 2.0', '>= 2.0.9'
 
-gem 'rake-builder', '~> 0.4.0'
-
-require 'RakeBuilder'
+require 'rake-builder'
 
 FLAGS = [ "--std=c++17", '-Wall', '-Werror', "-O3", "-s", "-DNDEBUG", '-Wno-deprecated' ]
-INCLUDES = [ 'Source', 'cppCommon/Source' ]
+INCLUDES = [ 'Source', 'cpp-common/Source', 'c8-cpp/src' ]
 PKGS = [ 'libnotify', 'gtk+-3.0' ]
 
-CPP_COMMON = GitSubmodule.new(name: 'cppCommon', libs: ['lib/libcommonOptionParser.a', 'lib/libcommonNetwork.a', 'lib/libcommon.a'])
+C8_CPP = GitSubmodule.new(name: 'c8-cpp', libs: ['lib/libc8-network.a', 'lib/libc8-option-parser.a', 'lib/libc8-common.a'])
 
-CONFIG = GeneratedFile.new(name: 'Source/Config.cpp') { |t|
+INSTALL = InstallPkg.new { |t|
+  t.name = :install_pkg
+  t.pkgs << 'libnotify-dev'
+}
+
+CONFIG = GeneratedFile.new(format: true) { |t|
   max = 60999
   min = 32768
   port = rand(max-min) + min
 
+  t.name = 'Source/Config.cpp'
   t.code = proc { |fn|
-    File.open(fn, 'w') { |f|
-      f.write '#include "Config.hpp"' "\n"
-      f.write "\n"
-      f.write "namespace Config\n"
-      f.write "{\n"
-      f.write "  const std::string PORT = \"#{port}\";\n"
-      f.write "}\n"
-    }
+    d = []
+    d << '#include "Config.hpp"'
+    d << ""
+    d << "namespace Config"
+    d << "{"
+    d << "  const std::string PORT = \"#{port}\";"
+    d << "}"
   }
 }
 
@@ -50,9 +37,10 @@ SHARED_FILES = mkSources(FileList['Source/*.cpp', 'Source/Config.cpp'].uniq, fla
 exe = Dir['Source/*'].select { |x| File.directory?(x) }.collect { |dir|
   Executable.new { |t|
     t.name = "bin/#{File.basename(dir)}"
+    t.requirements << INSTALL
     t.flags << FLAGS
     t.includes << INCLUDES
-    t.libs << CPP_COMMON << ['-lboost_system']
+    t.libs << [C8_CPP, '-lboost_system']
     t.pkgs << PKGS
     t.sources << SHARED_FILES << FileList["#{dir}/*.cpp"]
   }
